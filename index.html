@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wazzap - Automatisation des conversations par IA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #93c5fd;
+            --secondary: #f97316;
+            --secondary-dark: #ea580c;
+            --dark: #1e293b;
+            --darker: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+            --lighter-gray: #f1f5f9;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --radius: 8px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-color: white;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: white;
+            font-size: 20px;
+        }
+        
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .logo-text span {
+            color: var(--primary);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+        }
+        
+        nav ul li a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 15px;
+            transition: color 0.3s;
+            position: relative;
+        }
+        
+        nav ul li a:hover {
+            color: var(--primary);
+        }
+        
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary);
+            transition: width 0.3s;
+        }
+        
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+        
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-content {
+            position: absolute;
+            top: 100%;
+            left: -20px;
+            background: white;
+            min-width: 200px;
+            padding: 16px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        
+        .dropdown:hover .dropdown-content {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-content a {
+            display: block;
+            padding: 8px 0;
+            color: var(--dark);
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .dropdown-content a:hover {
+            color: var(--primary);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-outline {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            font-size: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--dark);
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 160px 0 100px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-light) 0%, rgba(147, 197, 253, 0.3) 100%);
+            opacity: 0.5;
+        }
+        
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -100px;
+            left: -100px;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.3) 0%, rgba(249, 115, 22, 0.1) 100%);
+            opacity: 0.5;
+        }
+        
+        .hero-content {
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-text {
+            flex: 1;
+            padding-right: 40px;
+        }
+        
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            background: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+        
+        .hero-badge i {
+            margin-right: 8px;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            color: var(--darker);
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+        
+        .btn-large {
+            padding: 14px 28px;
+            font-size: 16px;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--secondary-dark);
+        }
+        
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray);
+        }
+        
+        .hero-image {
+            flex: 1;
+            position: relative;
+        }
+        
+        .hero-image img {
+            width: 100%;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .hero-card {
+            position: absolute;
+            background: white;
+            padding: 16px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .hero-card-1 {
+            top: 20%;
+            left: -40px;
+            animation-delay: 0s;
+        }
+        
+        .hero-card-2 {
+            bottom: 20%;
+            right: -40px;
+            animation-delay: 1s;
+        }
+        
+        .hero-card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--lighter-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: var(--primary);
+            font-size: 18px;
+        }
+        
+        .hero-card-text {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 100px 0;
+            background-color: white;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            color: var(--darker);
+        }
+        
+        .section-title p {
+            font-size: 1.1rem;
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background-color: var(--light);
+            padding: 30px;
+            border-radius: var(--radius);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 0;
+            background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+            transition: height 0.3s;
+        }
+        
+        .feature-card:hover::before {
+            height: 100%;
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--darker);
+        }
+        
+        .feature-card p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+        
+        .feature-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .feature-link i {
+            margin-left: 5px;
+            transition: transform 0.3s;
+        }
+        
+        .feature-link:hover i {
+            transform: translateX(5px);
+        }
+        
+        /* How It Works */
+        .how-it-works {
+            padding: 100px 0;
+            background-color: var(--lighter-gray);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .how-it-works::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-light) 0%, rgba(147, 197, 253, 0.3) 100%);
+            opacity: 0.3;
+        }
+        
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .step {
+            text-align: center;
+            flex: 1;
+            padding: 0 20px;
+            position: relative;
+        }
+        
+        .step:not(:last-child):after {
+            content: '';
+            position: absolute;
+            top: 40px;
+            right: -50px;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(to right, var(--primary), var(--primary-light));
+        }
+        
+        .step-number {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 28px;
+            font-weight: 700;
+            position: relative;
+        }
+        
+        .step-number::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--primary-light);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+        
+        .step h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--darker);
+        }
+        
+        .step p {
+            color: var(--gray);
+        }
+        
+        /* Testimonials */
+        .testimonials {
+            padding: 100px 0;
+            background-color: white;
+        }
+        
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        
+        .testimonial-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--light-gray);
+            transition: transform 0.3s;
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 20px;
+            color: var(--dark);
+            position: relative;
+        }
+        
+        .testimonial-text::before {
+            content: '"';
+            font-size: 60px;
+            color: var(--primary-light);
+            position: absolute;
+            top: -20px;
+            left: -10px;
+            opacity: 0.3;
+            font-family: Georgia, serif;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+        }
+        
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--lighter-gray);
+            margin-right: 15px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 20px;
+        }
+        
+        .author-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .author-info p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .testimonial-rating {
+            color: var(--warning);
+            margin-top: 5px;
+        }
+        
+        /* CTA Section */
+        .cta {
+            padding: 100px 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: -100px;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .cta::after {
+            content: '';
+            position: absolute;
+            bottom: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .cta-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .cta p {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        
+        .cta-form {
+            display: flex;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .cta-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: var(--radius) 0 0 var(--radius);
+            font-size: 16px;
+        }
+        
+        .cta-button {
+            padding: 15px 30px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .cta-button:hover {
+            background: var(--secondary-dark);
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--darker);
+            color: white;
+            padding: 80px 0 30px;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+        
+        .footer-col h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .footer-col p {
+            opacity: 0.8;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .footer-col ul {
+            list-style: none;
+        }
+        
+        .footer-col ul li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-col ul li a {
+            color: white;
+            opacity: 0.8;
+            text-decoration: none;
+            transition: opacity 0.3s;
+            font-size: 14px;
+        }
+        
+        .footer-col ul li a:hover {
+            opacity: 1;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .social-links a:hover {
+            background-color: var(--primary);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .features-grid,
+            .testimonials-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .steps {
+                flex-direction: column;
+                gap: 40px;
+            }
+            
+            .step:not(:last-child):after {
+                display: none;
+            }
+            
+            .hero-content {
+                flex-direction: column;
+            }
+            
+            .hero-text {
+                padding-right: 0;
+                margin-bottom: 40px;
+                text-align: center;
+            }
+            
+            .hero-buttons {
+                justify-content: center;
+            }
+            
+            .hero-stats {
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            nav ul {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .features-grid,
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .cta-form {
+                flex-direction: column;
+            }
+            
+            .cta-input {
+                border-radius: var(--radius) var(--radius) 0 0;
+                margin-bottom: 1px;
+            }
+            
+            .cta-button {
+                border-radius: 0 0 var(--radius) var(--radius);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="#" class="logo">
+                <div class="logo-img">
+                    <i class="fas fa-comment-dots"></i>
+                </div>
+                <div class="logo-text">Wazz<span>ap</span></div>
+            </a>
+            
+            <nav>
+                <ul>
+                    <li class="dropdown">
+                        <a href="#">Solutions <i class="fas fa-chevron-down"></i></a>
+                        <div class="dropdown-content">
+                            <a href="#">Pour les entreprises</a>
+                            <a href="#">Pour le e-commerce</a>
+                            <a href="#">Pour les services</a>
+                            <a href="#">Pour les startups</a>
+                        </div>
+                    </li>
+                    <li><a href="#">Fonctionnalités</a></li>
+                    <li><a href="#">Tarifs</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">À propos</a></li>
+                </ul>
+            </nav>
+            
+            <div class="nav-buttons">
+                <a href="#" class="btn btn-outline">Connexion</a>
+                <a href="#" class="btn btn-primary">Essai gratuit</a>
+            </div>
+            
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <div class="hero-badge">
+                        <i class="fas fa-rocket"></i> Nouveau : intégration WhatsApp Business API
+                    </div>
+                    <h1>Automatisez vos conversations avec l'IA</h1>
+                    <p>Wazzap vous aide à engager vos clients grâce à des chatbots intelligents, disponibles 24h/24 et 7j/7 sur WhatsApp et autres plateformes de messagerie.</p>
+                    
+                    <div class="hero-buttons">
+                        <a href="#" class="btn btn-primary btn-large">Commencer gratuitement</a>
+                        <a href="#" class="btn btn-outline btn-large">
+                            <i class="fas fa-play-circle"></i> Voir une démo
+                        </a>
+                    </div>
+                    
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">95%</div>
+                            <div class="stat-label">de satisfaction client</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">24/7</div>
+                            <div class="stat-label">disponibilité</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">+500</div>
+                            <div class="stat-label">entreprises</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1533750349088-cd871a92f312?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Interface Wazzap">
+                    
+                    <div class="hero-card hero-card-1">
+                        <div class="hero-card-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="hero-card-text">
+                            Chatbot IA activé
+                        </div>
+                    </div>
+                    
+                    <div class="hero-card hero-card-2">
+                        <div class="hero-card-icon">
+                            <i class="fas fa-comment"></i>
+                        </div>
+                        <div class="hero-card-text">
+                            +45% de conversions
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Fonctionnalités puissantes</h2>
+                <p>Découvrez comment Wazzap peut transformer votre service client et votre génération de leads</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>Chatbots IA</h3>
+                    <p>Des assistants conversationnels intelligents qui comprennent et répondent naturellement à vos clients.</p>
+                    <a href="#" class="feature-link">
+                        En savoir plus <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Multiplateforme</h3>
+                    <p>Conversations sur WhatsApp, Messenger, Instagram et bien d'autres canaux depuis une seule interface.</p>
+                    <a href="#" class="feature-link">
+                        En savoir plus <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Analytique</h3>
+                    <p>Suivez les performances de vos conversations et optimisez votre stratégie de communication.</p>
+                    <a href="#" class="feature-link">
+                        En savoir plus <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h3>Intégrations</h3>
+                    <p>Connectez Wazzap à vos outils existants (CRM, ERP, etc.) pour un workflow unifié.</p>
+                    <a href="#" class="feature-link">
+                        En savoir plus <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <h3>Campagnes</h3>
+                    <p>Lancez des campagnes de messaging personnalisées à grande échelle.</p>
+                    <a href="#" class="feature-link">
+                        En savoir plus <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Sécurité</h3>
+                    <p>Vos données sont cryptées et stockées en conformité avec le RGPD.</p>
+                    <a href="#" class="feature-link">
+                        En savoir plus <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works">
+        <div class="container">
+            <div class="section-title">
+                <h2>Comment ça marche</h2>
+                <p>Mettez en place votre premier chatbot en seulement 3 étapes simples</p>
+            </div>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Inscription</h3>
+                    <p>Créez votre compte et connectez vos canaux de messagerie.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Configuration</h3>
+                    <p>Personnalisez votre chatbot selon vos besoins avec notre interface intuitive.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Lancement</h3>
+                    <p>Activez votre chatbot et commencez à converser avec vos clients.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="section-title">
+                <h2>Ils nous font confiance</h2>
+                <p>Découvrez les retours d'expérience de nos clients satisfaits</p>
+            </div>
+            
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        "Grâce à Wazzap, nous avons automatisé 80% de notre service client. Nos équipes peuvent maintenant se concentrer sur les cas complexes."
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="author-info">
+                            <h4>Marie Dupont</h4>
+                            <p>Directrice Marketing, RetailCo</p>
+                            <div class="testimonial-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        "L'implémentation a été très simple et nous avons vu des résultats dès la première semaine. Le support client est exceptionnel."
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="author-info">
+                            <h4>Thomas Martin</h4>
+                            <p>CEO, TechStartup</p>
+                            <div class="testimonial-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        "Nos clients adorent pouvoir nous contacter via WhatsApp. Le taux de satisfaction a augmenté de 30% depuis que nous utilisons Wazzap."
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="author-info">
+                            <h4>Sophie Leroy</h4>
+                            <p>Responsable CX, ServicePlus</p>
+                            <div class="testimonial-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Prêt à transformer votre service client ?</h2>
+                <p>Rejoignez les milliers d'entreprises qui utilisent déjà Wazzap pour automatiser leurs conversations. Essayez gratuitement pendant 14 jours.</p>
+                
+                <form class="cta-form">
+                    <input type="email" placeholder="Votre adresse email" class="cta-input" required>
+                    <button type="submit" class="cta-button">Commencer</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>Wazzap</h3>
+                    <p>Solution d'automatisation des conversations par intelligence artificielle pour les entreprises.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h3>Produit</h3>
+                    <ul>
+                        <li><a href="#">Fonctionnalités</a></li>
+                        <li><a href="#">Tarifs</a></li>
+                        <li><a href="#">Intégrations</a></li>
+                        <li><a href="#">Cas d'utilisation</a></li>
+                        <li><a href="#">API</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h3>Ressources</h3>
+                    <ul>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Webinaires</a></li>
+                        <li><a href="#">Centre d'aide</a></li>
+                        <li><a href="#">Statut du service</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h3>Entreprise</h3>
+                    <ul>
+                        <li><a href="#">À propos</a></li>
+                        <li><a href="#">Nous rejoindre</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Politique de confidentialité</a></li>
+                        <li><a href="#">Conditions d'utilisation</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 Wazzap. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu functionality
+        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+            const nav = document.querySelector('nav ul');
+            if (nav.style.display === 'flex') {
+                nav.style.display = 'none';
+            } else {
+                nav.style.display = 'flex';
+                nav.style.flexDirection = 'column';
+                nav.style.position = 'absolute';
+                nav.style.top = '100%';
+                nav.style.left = '0';
+                nav.style.right = '0';
+                nav.style.backgroundColor = 'white';
+                nav.style.padding = '20px';
+                nav.style.gap = '15px';
+                nav.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.1)';
+            }
+        });
+
+        // Animation on scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            const animatedElements = document.querySelectorAll('.feature-card, .testimonial-card, .step');
+            
+            function checkScroll() {
+                animatedElements.forEach(element => {
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const screenPosition = window.innerHeight / 1.3;
+                    
+                    if (elementPosition < screenPosition) {
+                        element.style.opacity = 1;
+                        element.style.transform = 'translateY(0)';
+                    }
+                });
+            }
+            
+            // Set initial state for animation
+            animatedElements.forEach(element => {
+                element.style.opacity = 0;
+                element.style.transform = 'translateY(20px)';
+                element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            });
+            
+            window.addEventListener('scroll', checkScroll);
+            checkScroll(); // Check on initial load
+        });
+    </script>
+</body>
+  </html>
